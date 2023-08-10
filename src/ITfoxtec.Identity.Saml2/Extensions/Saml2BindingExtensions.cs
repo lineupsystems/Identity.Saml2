@@ -28,19 +28,27 @@ namespace ITfoxtec.Identity.Saml2
                 yield return string.Join("=", element.Key, Uri.EscapeDataString(element.Value));
             }
         }
-
+        
         /// <summary>
         /// Get the Relay State Query string as a Dictionary of key value pairs.
         /// </summary>
         public static Dictionary<string, string> GetRelayStateQuery<T>(this Saml2Binding<T> saml2Binding)
         {
+            return GetRelayStateQuery(saml2Binding.RelayState);
+        }
+        
+        /// <summary>
+        /// Get the Relay State Query string as a Dictionary of key value pairs.
+        /// </summary>
+        public static Dictionary<string, string> GetRelayStateQuery(this string? rawRelayState)
+        {
             Dictionary<string, string> elements = new Dictionary<string,string>();
-            if(string.IsNullOrWhiteSpace(saml2Binding.RelayState))
+            if(string.IsNullOrWhiteSpace(rawRelayState))
             {
                 return elements;
             }
 
-            var match = Regex.Match(saml2Binding.RelayState, @"(?<key>[^=^&]+)=(?<value>[^=^&]*)(&(?<key>[^=^&]+)=(?<value>[^=^&]*))*");
+            var match = Regex.Match(rawRelayState, @"(?<key>[^=^&]+)=(?<value>[^=^&]*)(&(?<key>[^=^&]+)=(?<value>[^=^&]*))*");
             if (!match.Success || match.Groups["key"] == null || match.Groups["value"] == null)
             {
                 throw new InvalidDataException("Invalid Relay State Query.");

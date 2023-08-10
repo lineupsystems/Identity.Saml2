@@ -44,8 +44,8 @@ namespace TestWebAppCore
                 if (entityDescriptor.IdPSsoDescriptor != null)
                 {
                     saml2Configuration.AllowedIssuer = entityDescriptor.EntityId;
-                    saml2Configuration.SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location;
-                    saml2Configuration.SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location;
+                    saml2Configuration.SSOUrl = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location;
+                    saml2Configuration.SLOUrl = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location;
                     foreach (var signingCertificate in entityDescriptor.IdPSsoDescriptor.SigningCertificates)
                     {
                         if (signingCertificate.IsValidLocalTime())

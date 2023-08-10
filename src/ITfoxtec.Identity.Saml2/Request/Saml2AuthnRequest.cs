@@ -120,7 +120,7 @@ namespace ITfoxtec.Identity.Saml2
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            Destination = config.SingleSignOnDestination;
+            Destination = config.SSOUrl;
         }
 
         public override XmlDocument ToXml()

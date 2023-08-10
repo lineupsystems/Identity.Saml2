@@ -26,7 +26,7 @@ namespace TestWebAppCore.Controllers
             var config = new Saml2Configuration();
 
             config.Issuer = "http://some-domain.com/this-application";
-            config.SingleSignOnDestination = new Uri("https://test-adfs.itfoxtec.com/adfs/ls/");
+            config.SSOUrl = new Uri("https://test-adfs.itfoxtec.com/adfs/ls/");
             config.SigningCertificate = CertificateUtil.Load(Startup.AppEnvironment.MapToPhysicalFilePath("itfoxtec.identity.saml2.testwebappcore_Certificate.pfx"), "!QAZ2wsx");
             config.SignatureAlgorithm = Saml2SecurityAlgorithms.RsaSha256Signature;
 

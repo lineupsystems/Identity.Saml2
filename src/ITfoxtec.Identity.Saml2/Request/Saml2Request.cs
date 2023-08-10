@@ -8,6 +8,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Security.Cryptography.Xml;
 using System.Diagnostics;
+using System.Linq;
+using Serilog;
 #if NETFULL
 using System.IdentityModel.Tokens;
 #else
@@ -127,9 +129,8 @@ namespace ITfoxtec.Identity.Saml2
             Id = new Saml2Id();
             Version = Schemas.Saml2Constants.VersionNumber;
             IssueInstant = DateTimeOffset.UtcNow;
-#if DEBUG
-            Debug.WriteLine("Message ID: " + IdAsString);
-#endif
+
+            Log.Debug("Message ID: {IdAsString}", IdAsString);
         }
 
         protected virtual IEnumerable<XObject> GetXContent()
@@ -165,9 +166,7 @@ namespace ITfoxtec.Identity.Saml2
 
         protected internal virtual void Read(string xml, bool validate, bool detectReplayedTokens)
         {
-#if DEBUG
-            Debug.WriteLine("Saml2P: " + xml);
-#endif
+            Log.Debug("Saml2P: {Xml}", xml);
 
             XmlDocument = xml.ToXmlDocument();
 
@@ -233,27 +232,37 @@ namespace ITfoxtec.Identity.Saml2
             if(assertionElement == null)
             {
                 if (documentValidationResult != SignatureValidation.Valid)
-                    throw new InvalidSignatureException("Signature is invalid.");                
+                {
+                    throw new InvalidSignatureException("XML Signature is invalid.");
+                }
             }
             else
-            {                
+            {
                 var assertionValidationResult = ValidateXmlSignature(assertionElement);
                 if (documentValidationResult == SignatureValidation.Invalid || assertionValidationResult == SignatureValidation.Invalid || 
                     !(documentValidationResult == SignatureValidation.Valid || assertionValidationResult == SignatureValidation.Valid))
-                    throw new InvalidSignatureException("Signature is invalid.");
+                {
+                    throw new InvalidSignatureException("XML Signature is invalid.");
+                }
             }            
         }
 
         protected SignatureValidation ValidateXmlSignature(XmlElement xmlElement)
         {
             var xmlSignatures = xmlElement.SelectNodes($"*[local-name()='{Schemas.Saml2Constants.Message.Signature}' and namespace-uri()='{SignedXml.XmlDsigNamespaceUrl}']");
-            if(xmlSignatures.Count == 0)
+            if(xmlSignatures == null || xmlSignatures.Count == 0)
             {
                 return SignatureValidation.NotPresent;
             }
             if (xmlSignatures.Count > 1)
             {
                 throw new InvalidSignatureException("There is more then one Signature element.");
+            }
+            
+            if (!SignatureValidationCertificates.Any())
+            {
+                Log.Warning("No SignatureValidationCertificates, issuer {Issuer}", Issuer);
+                return SignatureValidation.NoValidationCertificates;
             }
 
             foreach (var signatureValidationCertificate in SignatureValidationCertificates)
@@ -275,7 +284,8 @@ namespace ITfoxtec.Identity.Saml2
         {
             Valid,
             Invalid,
-            NotPresent
+            NotPresent,
+            NoValidationCertificates
         }
     }
 }

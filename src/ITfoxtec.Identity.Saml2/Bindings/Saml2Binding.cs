@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
+using Serilog;
 
 namespace ITfoxtec.Identity.Saml2
 {
@@ -61,9 +62,7 @@ namespace ITfoxtec.Identity.Saml2
             {
                 XmlDocument = saml2RequestResponse.ToXml();
 
-#if DEBUG
-                Debug.WriteLine("Saml2P: " + XmlDocument.OuterXml);
-#endif
+                Log.Debug("Saml2P: {OuterXml}", XmlDocument.OuterXml);
             }
             return this;
         }

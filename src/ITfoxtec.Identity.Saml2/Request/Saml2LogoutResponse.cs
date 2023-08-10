@@ -20,7 +20,7 @@ namespace ITfoxtec.Identity.Saml2
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            Destination = config.SingleLogoutDestination;
+            Destination = config.SLOUrl;
         }
 
         protected override void ValidateElementName()

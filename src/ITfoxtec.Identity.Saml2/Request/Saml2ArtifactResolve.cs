@@ -36,7 +36,7 @@ namespace ITfoxtec.Identity.Saml2
 
             CertificateIncludeOption = X509IncludeOption.EndCertOnly;
 
-            Destination = config.SingleSignOnDestination;  
+            Destination = config.SSOUrl;  
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace ITfoxtec.Identity.Saml2
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            Destination = config.SingleLogoutDestination;
+            Destination = config.SLOUrl;
             NotOnOrAfter = DateTimeOffset.UtcNow.AddMinutes(10);
         }
 
@@ -59,6 +59,19 @@ namespace ITfoxtec.Identity.Saml2
                 }
                 SessionIndex = ReadClaimValue(identity, Saml2ClaimTypes.SessionIndex, false);
             }           
+        }
+        
+        /// <summary>
+        /// Constructs <see cref="Saml2LogoutRequest"/> with the given parameters obtained from IdPSession
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="nameIdFormat"></param>
+        /// <param name="nameId"></param>
+        /// <param name="sessionIndex"></param>
+        public Saml2LogoutRequest(Saml2Configuration config, string nameIdFormat, string nameId, string sessionIndex) : this(config)
+        {
+            NameId = new Saml2NameIdentifier(nameId, new Uri(nameIdFormat));
+            SessionIndex = sessionIndex;
         }
 
         private static string ReadClaimValue(ClaimsIdentity identity, string claimType, bool required = true)

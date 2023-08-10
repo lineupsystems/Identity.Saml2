@@ -8,6 +8,7 @@ using ITfoxtec.Identity.Saml2.Cryptography;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Serilog;
 #if NETFULL
 using System.IdentityModel.Tokens;
 using System.IdentityModel.Protocols.WSTrust;
@@ -58,7 +59,7 @@ namespace ITfoxtec.Identity.Saml2
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            Destination = config.SingleSignOnDestination;
+            Destination = config.SSOUrl;
 
             if (config.DecryptionCertificate != null)
             {
@@ -334,9 +335,8 @@ namespace ITfoxtec.Identity.Saml2
             if (DecryptionCertificate != null)
             {
                 new Saml2EncryptedXml(XmlDocument, DecryptionCertificate.GetSamlRSAPrivateKey()).DecryptDocument();
-#if DEBUG
-                Debug.WriteLine("Saml2P (Decrypted): " + XmlDocument.OuterXml);
-#endif
+
+                Log.Debug("Saml2P (Decrypted): {OuterXml}", XmlDocument.OuterXml);
             }
         }
 
@@ -359,9 +359,7 @@ namespace ITfoxtec.Identity.Saml2
             var encryptedAssertionElement = XmlDocument.DocumentElement[Schemas.Saml2Constants.Message.EncryptedAssertion, Schemas.Saml2Constants.AssertionNamespace.OriginalString];
             encryptedAssertionElement.AppendChild(XmlDocument.ImportNode(encryptedDataElement, true));
 
-#if DEBUG
-            Debug.WriteLine("Saml2P (Encrypted): " + XmlDocument.OuterXml);
-#endif
+            Log.Debug("Saml2P (Encrypted): {OuterXml}", XmlDocument.OuterXml);
         }
     }
 }

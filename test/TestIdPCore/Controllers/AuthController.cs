@@ -231,8 +231,8 @@ namespace TestIdPCore.Controllers
             {
                 Issuer = config.Issuer,
                 SignAuthnRequest = config.SignAuthnRequest,
-                SingleSignOnDestination = config.SingleSignOnDestination,
-                SingleLogoutDestination = config.SingleLogoutDestination,
+                SSOUrl = config.SSOUrl,
+                SLOUrl = config.SLOUrl,
                 ArtifactResolutionService = config.ArtifactResolutionService,
                 SigningCertificate = config.SigningCertificate,
                 SignatureAlgorithm = config.SignatureAlgorithm,

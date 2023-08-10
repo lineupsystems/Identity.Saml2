@@ -37,11 +37,11 @@ namespace TestWebApp.Controllers
                 //},
                 SingleSignOnServices = new SingleSignOnService[]
                 {
-                    new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = config.SingleSignOnDestination }
+                    new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = config.SSOUrl }
                 },
                 SingleLogoutServices = new SingleLogoutService[]
                 {
-                    new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = config.SingleLogoutDestination }
+                    new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = config.SLOUrl }
                 },
                 ArtifactResolutionServices = new ArtifactResolutionService[]
                 {
