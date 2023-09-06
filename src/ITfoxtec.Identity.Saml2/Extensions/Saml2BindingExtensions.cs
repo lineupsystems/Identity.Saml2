@@ -10,7 +10,7 @@ namespace ITfoxtec.Identity.Saml2
         /// <summary>
         /// Set a Dictionary of key value pairs as a Query string in the Relay State.
         /// </summary>
-        public static string SetRelayStateQuery<T>(this Saml2Binding<T> saml2Binding, Dictionary<string, string> elements)
+        public static string SetRelayStateQuery(this Saml2Binding saml2Binding, Dictionary<string, string> elements)
         {
             if(elements == null)
             {
@@ -32,7 +32,7 @@ namespace ITfoxtec.Identity.Saml2
         /// <summary>
         /// Get the Relay State Query string as a Dictionary of key value pairs.
         /// </summary>
-        public static Dictionary<string, string> GetRelayStateQuery<T>(this Saml2Binding<T> saml2Binding)
+        public static Dictionary<string, string> GetRelayStateQuery(this Saml2Binding saml2Binding)
         {
             return GetRelayStateQuery(saml2Binding.RelayState);
         }

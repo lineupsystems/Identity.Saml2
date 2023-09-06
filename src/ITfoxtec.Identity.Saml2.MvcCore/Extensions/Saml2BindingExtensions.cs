@@ -7,6 +7,18 @@ namespace ITfoxtec.Identity.Saml2.MvcCore
     /// </summary>
     public static class Saml2BindingExtensions
     {
+        public static IActionResult ToActionResult(this Saml2Binding binding)
+        {
+            return binding switch
+            {
+                Saml2RedirectBinding redirectBinding => redirectBinding.ToActionResult(),
+                Saml2PostBinding postBinding => postBinding.ToActionResult(),
+                Saml2ArtifactBinding artifactBinding => artifactBinding.ToActionResult(),
+                Saml2SoapEnvelope soapBinding => soapBinding.ToActionResult(),
+                _ => throw new InvalidSaml2BindingException("Unknown Saml2Binding type!")
+            };
+        }
+        
         /// <summary>
         /// To Redirect Action Result
         /// </summary>
@@ -23,7 +35,8 @@ namespace ITfoxtec.Identity.Saml2.MvcCore
             return new ContentResult
             {
                 ContentType = "text/html",
-                Content = binding.PostContent
+                Content = binding.PostContent,
+                StatusCode = 200
             };
         }
 
@@ -43,7 +56,8 @@ namespace ITfoxtec.Identity.Saml2.MvcCore
             return new ContentResult
             {
                 ContentType = "text/xml; charset=\"utf-8\"",                
-                Content = binding.SoapResponseXml
+                Content = binding.SoapResponseXml,
+                StatusCode = 200
             };
         }
 
@@ -56,6 +70,7 @@ namespace ITfoxtec.Identity.Saml2.MvcCore
             {
                 ContentType = "text/xml",
                 Content = metadata.ToXml(),
+                StatusCode = 200
             };
         }
     }

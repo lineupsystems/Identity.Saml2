@@ -14,7 +14,7 @@ using System.Xml.Linq;
 
 namespace ITfoxtec.Identity.Saml2
 {
-    public class Saml2SoapEnvelope : Saml2Binding<Saml2SoapEnvelope>
+    public class Saml2SoapEnvelope : Saml2Binding
     {
         /// <summary>
         /// SOAP response XML.

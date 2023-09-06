@@ -30,7 +30,7 @@ namespace ITfoxtec.Identity.Saml2.Schemas
         /// <summary>
         /// The XML namespace of the SAML2 Assertion.
         /// </summary>
-        internal static readonly Uri AssertionNamespace = new Uri("urn:oasis:names:tc:SAML:2.0:assertion");
+        public static readonly Uri AssertionNamespace = new Uri("urn:oasis:names:tc:SAML:2.0:assertion");
         /// <summary>
         /// The XML namespace of the SAML2 Assertion.
         /// </summary>
@@ -43,7 +43,7 @@ namespace ITfoxtec.Identity.Saml2.Schemas
         /// <summary>
         /// The XML namespace of the SAML2 Protocol.
         /// </summary>
-        internal static readonly Uri ProtocolNamespace = new Uri("urn:oasis:names:tc:SAML:2.0:protocol");
+        public static readonly Uri ProtocolNamespace = new Uri("urn:oasis:names:tc:SAML:2.0:protocol");
         /// <summary>
         /// The XML namespace of the SAML2 Protocol.
         /// </summary>
@@ -94,93 +94,93 @@ namespace ITfoxtec.Identity.Saml2.Schemas
 
             public const string ArtifactResponse = "ArtifactResponse";
 
-            internal const string Artifact = "Artifact";
+            public const string Artifact = "Artifact";
 
-            internal const string Id = "ID";
+            public const string Id = "ID";
 
-            internal const string Version = "Version";
+            public const string Version = "Version";
 
-            internal const string IssueInstant = "IssueInstant";
+            public const string IssueInstant = "IssueInstant";
 
-            internal const string Consent = "Consent";
+            public const string Consent = "Consent";
 
-            internal const string Destination = "Destination";
+            public const string Destination = "Destination";
 
-            internal const string Signature = "Signature";
+            public const string Signature = "Signature";
 
-            internal const string SigAlg = "SigAlg";
+            public const string SigAlg = "SigAlg";
 
-            internal const string Issuer = "Issuer";
+            public const string Issuer = "Issuer";
 
-            internal const string Status = "Status";
+            public const string Status = "Status";
 
-            internal const string StatusCode = "StatusCode";
+            public const string StatusCode = "StatusCode";
 
-            internal const string StatusMessage = "StatusMessage";
+            public const string StatusMessage = "StatusMessage";
 
-            internal const string Value = "Value";
+            public const string Value = "Value";
 
-            internal const string AssertionConsumerServiceIndex = "AssertionConsumerServiceIndex";
+            public const string AssertionConsumerServiceIndex = "AssertionConsumerServiceIndex";
 
-            internal const string AssertionConsumerServiceURL = "AssertionConsumerServiceURL";
+            public const string AssertionConsumerServiceURL = "AssertionConsumerServiceURL";
 
-            internal const string AttributeConsumingServiceIndex = "AttributeConsumingServiceIndex";
+            public const string AttributeConsumingServiceIndex = "AttributeConsumingServiceIndex";
 
-            internal const string ProtocolBinding = "ProtocolBinding";
+            public const string ProtocolBinding = "ProtocolBinding";
 
-            internal const string RequestedAuthnContext = "RequestedAuthnContext";
+            public const string RequestedAuthnContext = "RequestedAuthnContext";
 
-            internal const string Comparison = "Comparison";
+            public const string Comparison = "Comparison";
 
-            internal const string AuthnContextClassRef = "AuthnContextClassRef";
+            public const string AuthnContextClassRef = "AuthnContextClassRef";
 
-            internal const string ForceAuthn = "ForceAuthn";
+            public const string ForceAuthn = "ForceAuthn";
 
-            internal const string IsPassive = "IsPassive";
+            public const string IsPassive = "IsPassive";
 
-            internal const string NameId = "NameID";
+            public const string NameId = "NameID";
 
-            internal const string SessionIndex = "SessionIndex";
+            public const string SessionIndex = "SessionIndex";
 
-            internal const string Format = "Format";
+            public const string Format = "Format";
 
-            internal const string NotOnOrAfter = "NotOnOrAfter";
+            public const string NotOnOrAfter = "NotOnOrAfter";
 
-            internal const string NotBefore = "NotBefore";
+            public const string NotBefore = "NotBefore";
 
-            internal const string Reason = "Reason";
+            public const string Reason = "Reason";
             
-            internal const string NameIdPolicy = "NameIDPolicy";
+            public const string NameIdPolicy = "NameIDPolicy";
 
-            internal const string AllowCreate = "AllowCreate";
+            public const string AllowCreate = "AllowCreate";
 
-            internal const string SpNameQualifier = "SPNameQualifier";
+            public const string SpNameQualifier = "SPNameQualifier";
             
-            internal const string Extensions = "Extensions";
+            public const string Extensions = "Extensions";
 
-            internal const string InResponseTo = "InResponseTo";
+            public const string InResponseTo = "InResponseTo";
 
-            internal const string Conditions = "Conditions";
+            public const string Conditions = "Conditions";
 
-            internal const string AudienceRestriction = "AudienceRestriction";
+            public const string AudienceRestriction = "AudienceRestriction";
 
-            internal const string Audience = "Audience";
+            public const string Audience = "Audience";
 
-            internal const string Subject = "Subject";
+            public const string Subject = "Subject";
 
-            internal const string SubjectConfirmation = "SubjectConfirmation";
+            public const string SubjectConfirmation = "SubjectConfirmation";
 
-            internal const string SubjectConfirmationData = "SubjectConfirmationData";
+            public const string SubjectConfirmationData = "SubjectConfirmationData";
 
-            internal const string OneTimeUse = "OneTimeUse";
+            public const string OneTimeUse = "OneTimeUse";
 
-            internal const string ProxyRestriction = "ProxyRestriction";
+            public const string ProxyRestriction = "ProxyRestriction";
 
-            internal const string Count = "Count";
+            public const string Count = "Count";
 
-            internal const string Envelope = "Envelope";
+            public const string Envelope = "Envelope";
 
-            internal const string Body = "Body";
+            public const string Body = "Body";
         }
     }
 }

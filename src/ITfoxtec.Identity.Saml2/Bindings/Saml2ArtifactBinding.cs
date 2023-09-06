@@ -7,7 +7,7 @@ using ITfoxtec.Identity.Saml2.Http;
 
 namespace ITfoxtec.Identity.Saml2
 {
-    public class Saml2ArtifactBinding : Saml2Binding<Saml2ArtifactBinding> 
+    public class Saml2ArtifactBinding : Saml2Binding
     {
         /// <summary>
         /// [Optional]

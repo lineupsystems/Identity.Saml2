@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using ITfoxtec.Identity.Saml2.Schemas;
 using ITfoxtec.Identity.Saml2.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using ITfoxtec.Identity.Saml2.Util;
 using ITfoxtec.Identity.Saml2.Http;
+using ITfoxtec.Identity.Saml2.Http.Compression;
 
 namespace ITfoxtec.Identity.Saml2
 {
-    public class Saml2RedirectBinding : Saml2Binding<Saml2RedirectBinding>
+    public class Saml2RedirectBinding : Saml2Binding
     {
         public Uri RedirectLocation { get; protected set; }
 
@@ -79,16 +77,7 @@ namespace ITfoxtec.Identity.Saml2
 
         private string CompressRequest()
         {
-            using (var compressedStream = new MemoryStream())
-            using (var deflateStream = new DeflateStream(compressedStream, CompressionMode.Compress))
-            {
-                using (var originalStream = new StreamWriter(deflateStream))
-                {
-                    originalStream.Write(XmlDocument.OuterXml);
-                }
-
-                return Convert.ToBase64String(compressedStream.ToArray());
-            }
+            return SamlCompressionHelper.CompressRequest(XmlDocument.OuterXml);
         }
 
         protected override Saml2Request UnbindInternal(HttpRequest request, Saml2Request saml2RequestResponse, string messageName)
@@ -157,7 +146,7 @@ namespace ITfoxtec.Identity.Saml2
                 RelayState = request.Query[Saml2Constants.Message.RelayState];
             }
 
-            saml2RequestResponse.Read(DecompressResponse(request.Query[messageName]), validate, detectReplayedTokens);
+            saml2RequestResponse.Read(SamlCompressionHelper.DecompressResponse(request.Query[messageName]), validate, detectReplayedTokens);
             XmlDocument = saml2RequestResponse.XmlDocument;
             return saml2RequestResponse;
         }
@@ -181,19 +170,6 @@ namespace ITfoxtec.Identity.Saml2
                 }
             }
             throw new InvalidSignatureException("Signature is invalid.");
-        }
-
-        private string DecompressResponse(string value)
-        {
-            using (var originalStream = new MemoryStream(Convert.FromBase64String(value)))
-            using (var decompressedStream = new MemoryStream())
-            {
-                using (var deflateStream = new DeflateStream(originalStream, CompressionMode.Decompress))
-                {
-                    deflateStream.CopyTo(decompressedStream);
-                }
-                return Encoding.UTF8.GetString(decompressedStream.ToArray());
-            }
         }
     }
 }

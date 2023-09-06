@@ -61,6 +61,7 @@ namespace ITfoxtec.Identity.Saml2.Configuration
             configuration.ValidateAudience = config.AudienceRestricted;
             configuration.ValidAudiences = config.AllowedAudienceUris.Select(a => a);
             configuration.ValidIssuer = config.AllowedIssuer;
+            configuration.RequireAudience = config.RequireAudience;
 
             configuration.ValidateTokenReplay = config.DetectReplayedTokens;
             if (config.TokenReplayCache != null)

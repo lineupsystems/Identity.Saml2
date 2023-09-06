@@ -10,7 +10,7 @@ using System.Net;
 
 namespace ITfoxtec.Identity.Saml2
 {
-    public class Saml2PostBinding : Saml2Binding<Saml2PostBinding>
+    public class Saml2PostBinding : Saml2Binding
     {
         /// <summary>
         /// [Optional]

@@ -42,7 +42,7 @@ namespace ITfoxtec.Identity.Saml2
         /// <summary>
         /// SingleLogoutDestination
         /// </summary>
-        public Uri SLOUrl { get; set; }
+        public Uri? SLOUrl { get; set; }
 
         /// <summary>
         /// Endpoint used for handling SAML artifact resolution requests. Artifacts are a means of communication in SAML that allows transferring large SAML messages or responses efficiently.
