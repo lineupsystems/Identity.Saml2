@@ -4,7 +4,7 @@
     <Company>ITfoxtec</Company>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <AssemblyName>ITfoxtec.Identity.Saml2.MvcCore</AssemblyName>
-    <PackageId>ITFoxtec.Identity.Saml2.MvcCore</PackageId>
+    <PackageId>Lineup.Identity.Saml2.MvcCore</PackageId>
     <Title>ITfoxtec Identity SAML 2.0 MVC Core for Lineup</Title>
     <Description>ASP.NET MVC Core is supported by the ITfoxtec Identity SAML2 MVC Core package which helps to integrate the ITfoxtec Identity SAML2 package and add support for SAML-P and SAML 2.0 tokens.
 

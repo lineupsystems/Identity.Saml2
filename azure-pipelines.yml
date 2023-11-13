@@ -45,12 +45,11 @@ steps:
       restoreSolution: '$(solution)'
 
   - task: DotNetCoreCLI@2
-    displayName: 'DotNet Pack ITfoxtec.Identity.Saml2.MvcCor'
+    displayName: 'DotNet Pack Lineup.Identity.Saml2.MvcCore'
     inputs:
       command: 'pack'
       packagesToPack: '$(Build.SourcesDirectory)\src\ITfoxtec.Identity.Saml2.MvcCore\ITfoxtec.Identity.Saml2.MvcCore.csproj'
       versioningScheme: 'off'
-      buildProperties: 'PackageID=Lineup.Saml2.MvcCore'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Build Artefacts(pipeline only)'
