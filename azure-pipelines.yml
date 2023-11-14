@@ -50,12 +50,19 @@ steps:
       command: 'pack'
       packagesToPack: '$(Build.SourcesDirectory)\src\ITfoxtec.Identity.Saml2.MvcCore\ITfoxtec.Identity.Saml2.MvcCore.csproj'
       versioningScheme: 'off'
+      
+  - task: DotNetCoreCLI@2
+    displayName: 'DotNet Pack Lineup.Identity.Saml2'
+    inputs:
+      command: 'pack'
+      packagesToPack: '$(Build.SourcesDirectory)\src\ITfoxtec.Identity.Saml2\ITfoxtec.Identity.Saml2.csproj'
+      versioningScheme: 'off'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Build Artefacts(pipeline only)'
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'Lineup.Saml2.MvcCore'
+      ArtifactName: 'Lineup.Saml2'
       publishLocation: 'Container'
 
   - task: DotNetCoreCLI@2
