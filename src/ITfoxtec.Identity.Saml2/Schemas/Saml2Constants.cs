@@ -1,10 +1,22 @@
-﻿using System;
+﻿#if !NETFULL
+using Microsoft.IdentityModel.Tokens;
+#endif
+using System;
 using System.Xml.Linq;
 
 namespace ITfoxtec.Identity.Saml2.Schemas
 {
     public static class Saml2Constants
     {
+        /// <summary>
+        /// SAML 2.0 request / response max length.
+        /// </summary>
+#if !NETFULL
+        public const int RequestResponseMaxLength = TokenValidationParameters.DefaultMaximumTokenSizeInBytes;
+#else
+        public const int RequestResponseMaxLength = 1024 * 250;        
+#endif
+
         /// <summary>
         /// SAML 2.0 Authentication Type.
         /// </summary>
