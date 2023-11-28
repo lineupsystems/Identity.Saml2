@@ -52,8 +52,7 @@ namespace ITfoxtec.Identity.Saml2
         /// <summary>
         /// Get the Relay State Query string as a Dictionary of key value pairs.
         /// </summary>
-        public static Dictionary<string, string> GetRelayStateQuery<T>(this T saml2Binding)
-            where T : Saml2Binding
+        public static Dictionary<string, string> GetRelayStateQuery(this Saml2Binding saml2Binding)
         {
             return GetRelayStateQuery(saml2Binding.RelayState);
         }
@@ -64,7 +63,7 @@ namespace ITfoxtec.Identity.Saml2
         public static Dictionary<string, string> GetRelayStateQuery(this string? rawRelayState)
         {
             Dictionary<string, string> elements = new Dictionary<string,string>();
-            if (string.IsNullOrWhiteSpace(saml2Binding.RelayState))
+            if(string.IsNullOrWhiteSpace(rawRelayState))
             {
                 return elements;
             }

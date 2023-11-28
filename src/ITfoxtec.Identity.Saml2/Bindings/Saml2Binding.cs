@@ -4,9 +4,7 @@ using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
-#if DEBUG
-using System.Diagnostics;
-#endif
+using Serilog;
 
 namespace ITfoxtec.Identity.Saml2
 {
@@ -52,7 +50,7 @@ namespace ITfoxtec.Identity.Saml2
             }
         }
 
-        protected abstract Saml2Binding BindInternal(Saml2Request saml2RequestResponse, string messageName);
+        protected internal abstract void BindInternal(Saml2Request saml2RequestResponse, string messageName);
 
         public Saml2Request Unbind(HttpRequest request, Saml2Request saml2Request)
         {
