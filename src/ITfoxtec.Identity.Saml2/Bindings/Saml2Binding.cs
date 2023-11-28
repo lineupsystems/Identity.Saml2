@@ -1,11 +1,12 @@
-﻿using ITfoxtec.Identity.Saml2.Http;
+using ITfoxtec.Identity.Saml2.Http;
 using ITfoxtec.Identity.Saml2.Schemas;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
-using Serilog;
+#if DEBUG
+using System.Diagnostics;
+#endif
 
 namespace ITfoxtec.Identity.Saml2
 {
@@ -27,22 +28,7 @@ namespace ITfoxtec.Identity.Saml2
         public Saml2Binding()
         { }
 
-        public Saml2Binding Bind(Saml2Request saml2Request)
-        {
-            return BindInternal(saml2Request, Saml2Constants.Message.SamlRequest);
-        }
-
-        public Saml2Binding Bind(Saml2Response saml2Response)
-        {
-            return BindInternal(saml2Response, Saml2Constants.Message.SamlResponse);
-        }
-
-        public Saml2Binding Bind(Saml2ArtifactResolve saml2ArtifactResolve)
-        {
-            return BindInternal(saml2ArtifactResolve, Saml2Constants.Message.SamlArt);
-        }
-
-        protected virtual Saml2Binding BindInternal(Saml2Request saml2RequestResponse, bool createXml = true)
+        protected internal virtual void BindInternal(Saml2Request saml2RequestResponse, bool createXml = true)
         {
             if (saml2RequestResponse == null)
                 throw new ArgumentNullException(nameof(saml2RequestResponse));
@@ -64,7 +50,6 @@ namespace ITfoxtec.Identity.Saml2
 
                 Log.Debug("Saml2P: {OuterXml}", XmlDocument.OuterXml);
             }
-            return this;
         }
 
         protected abstract Saml2Binding BindInternal(Saml2Request saml2RequestResponse, string messageName);
@@ -94,7 +79,7 @@ namespace ITfoxtec.Identity.Saml2
 
             if (saml2RequestResponse.Config == null)
                 throw new ArgumentNullException("saml2RequestResponse.Config");
-            
+
             SetSignatureValidationCertificates(saml2RequestResponse);
 
             return saml2RequestResponse;

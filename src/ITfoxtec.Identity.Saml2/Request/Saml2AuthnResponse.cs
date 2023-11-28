@@ -1,4 +1,4 @@
-﻿using ITfoxtec.Identity.Saml2.Tokens;
+using ITfoxtec.Identity.Saml2.Tokens;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -27,7 +27,7 @@ namespace ITfoxtec.Identity.Saml2
     {
         public override string ElementName => Schemas.Saml2Constants.Message.AuthnResponse;
 
-        internal X509Certificate2 DecryptionCertificate { get; private set; }
+        internal IEnumerable<X509Certificate2> DecryptionCertificates { get; private set; }
         internal X509Certificate2 EncryptionCertificate { get; private set; }
 
         /// <summary>
@@ -61,15 +61,15 @@ namespace ITfoxtec.Identity.Saml2
 
             Destination = config.SSOUrl;
 
-            if (config.DecryptionCertificate != null)
+            if (config.DecryptionCertificates?.Count() > 0)
             {
-                DecryptionCertificate = config.DecryptionCertificate;
-                if (config.DecryptionCertificate.GetSamlRSAPrivateKey() == null)
+                DecryptionCertificates = config.DecryptionCertificates.Where(c => c.GetSamlRSAPrivateKey() != null);
+                if (!(DecryptionCertificates?.Count() > 0))
                 {
-                    throw new ArgumentException("No RSA Private Key present in Decryption Certificate or missing private key read credentials.");
+                    throw new ArgumentException("No RSA Private Key present in Decryption Certificates or missing private key read credentials.");
                 }
             }
-            if(config.EncryptionCertificate != null)
+            if (config.EncryptionCertificate != null)
             {
                 EncryptionCertificate = config.EncryptionCertificate;
                 if (config.EncryptionCertificate.GetRSAPublicKey() == null)
@@ -93,10 +93,11 @@ namespace ITfoxtec.Identity.Saml2
         /// </summary>
         /// <param name="appliesToAddress">The address for the AppliesTo property in the RequestSecurityTokenResponse.</param>
         /// <param name="authnContext">The URI reference that identifies an authentication context class that describes the authentication context declaration that follows. [Saml2Core, 2.7.2.2]</param>
+        /// <param name="declAuthnContext">The declaration URI reference of the authentication context class that describes the authentication context declaration. [Saml2Core, 2.7.2.2]</param>
         /// <param name="subjectConfirmationLifetime">The Subject Confirmation Lifetime in minutes.</param>
         /// <param name="issuedTokenLifetime">The Issued Token Lifetime in minutes.</param>
         /// <returns>The SAML 2.0 Security Token.</returns>
-        public Saml2SecurityToken CreateSecurityToken(string appliesToAddress, Uri authnContext = null, int subjectConfirmationLifetime = 5, int issuedTokenLifetime = 60)
+        public Saml2SecurityToken CreateSecurityToken(string appliesToAddress, Uri authnContext = null, Uri declAuthnContext = null, int subjectConfirmationLifetime = 5, int issuedTokenLifetime = 60)
         {
             if (appliesToAddress == null) throw new ArgumentNullException(nameof(appliesToAddress));
             if (ClaimsIdentity == null) throw new ArgumentNullException("ClaimsIdentity property");
@@ -105,7 +106,7 @@ namespace ITfoxtec.Identity.Saml2
             Saml2SecurityToken = Saml2SecurityTokenHandler.CreateToken(tokenDescriptor) as Saml2SecurityToken;
 
             AddNameIdFormat(ClaimsIdentity.Claims);
-            AddAuthenticationStatement(CreateAuthenticationStatement(authnContext));
+            AddAuthenticationStatement(CreateAuthenticationStatement(authnContext, declAuthnContext));
             AddSubjectConfirmation(CreateSubjectConfirmation(subjectConfirmationLifetime));
 
             return Saml2SecurityToken;
@@ -171,9 +172,25 @@ namespace ITfoxtec.Identity.Saml2
             return new Saml2SubjectConfirmation(Schemas.Saml2Constants.Saml2BearerToken, subjectConfirmationData);
         }
 
-        protected virtual Saml2AuthenticationStatement CreateAuthenticationStatement(Uri authnContext)
+        protected virtual Saml2AuthenticationStatement CreateAuthenticationStatement(Uri authnContext, Uri declAuthnContext)
         {
-            var authenticationStatement = new Saml2AuthenticationStatement(new Saml2AuthenticationContext(authnContext ?? Schemas.AuthnContextClassTypes.PasswordProtectedTransport));
+            var saml2AuthenticationContext = new Saml2AuthenticationContext();
+            if (authnContext == null && declAuthnContext == null)
+            {
+                saml2AuthenticationContext.ClassReference = Schemas.AuthnContextClassTypes.PasswordProtectedTransport;
+            }
+            else
+            {
+                if (authnContext != null)
+                {
+                    saml2AuthenticationContext.ClassReference = authnContext;
+                }
+                if (declAuthnContext != null)
+                {
+                    saml2AuthenticationContext.DeclarationReference = declAuthnContext;
+                }
+            }
+            var authenticationStatement = new Saml2AuthenticationStatement(saml2AuthenticationContext);
             authenticationStatement.SessionIndex = SessionIndex;
             return authenticationStatement;
         }
@@ -241,7 +258,7 @@ namespace ITfoxtec.Identity.Saml2
             if (Status == Schemas.Saml2StatusCodes.Success)
             {
                 var assertionElement = GetAssertionElement();
-                ValidateAssertionExpiration(assertionElement);
+                ValidateAssertionSubject(assertionElement);
 
 #if NETFULL
                 Saml2SecurityToken = ReadSecurityToken(assertionElement);
@@ -278,7 +295,7 @@ namespace ITfoxtec.Identity.Saml2
             return assertionElements[0] as XmlElement;
         }
 
-        private void ValidateAssertionExpiration(XmlNode assertionElement)
+        private void ValidateAssertionSubject(XmlNode assertionElement)
         {
             var subjectElement = assertionElement[Schemas.Saml2Constants.Message.Subject, Schemas.Saml2Constants.AssertionNamespace.OriginalString];
             if (subjectElement == null)
@@ -286,6 +303,11 @@ namespace ITfoxtec.Identity.Saml2
                 throw new Saml2RequestException("Subject Not Found.");
             }
 
+            ValidateSubjectConfirmationExpiration(subjectElement);
+        }
+
+        protected virtual void ValidateSubjectConfirmationExpiration(XmlElement subjectElement)
+        {
             var subjectConfirmationElement = subjectElement[Schemas.Saml2Constants.Message.SubjectConfirmation, Schemas.Saml2Constants.AssertionNamespace.OriginalString];
             if (subjectConfirmationElement == null)
             {
@@ -332,11 +354,27 @@ namespace ITfoxtec.Identity.Saml2
 
         protected override void DecryptMessage()
         {
-            if (DecryptionCertificate != null)
+            if (DecryptionCertificates?.Count() > 0)
             {
-                new Saml2EncryptedXml(XmlDocument, DecryptionCertificate.GetSamlRSAPrivateKey()).DecryptDocument();
-
+                var exceptions = new List<Exception>();
+                foreach (var decryptionCertificate in DecryptionCertificates)
+                {
+                    try
+                    {
+                        new Saml2EncryptedXml(XmlDocument, decryptionCertificate.GetSamlRSAPrivateKey()).DecryptDocument();
+                        // Stop the look when the message successfully decrypted.
+                        return;
+                    }
+                    catch (Exception e)
+                    {
+                        exceptions.Add(e);
+                    }
+                }
+                throw new AggregateException("Failed to decrypt message", exceptions);
+#if DEBUG
                 Log.Debug("Saml2P (Decrypted): {OuterXml}", XmlDocument.OuterXml);
+#endif
+                
             }
         }
 

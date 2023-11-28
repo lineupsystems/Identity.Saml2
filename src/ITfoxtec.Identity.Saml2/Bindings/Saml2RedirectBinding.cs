@@ -17,7 +17,7 @@ namespace ITfoxtec.Identity.Saml2
 
         public string Signature { get; protected set; }
 
-        protected override Saml2RedirectBinding BindInternal(Saml2Request saml2RequestResponse, string messageName)
+        protected internal override void BindInternal(Saml2Request saml2RequestResponse, string messageName)
         {
             base.BindInternal(saml2RequestResponse);
 
@@ -48,8 +48,6 @@ namespace ITfoxtec.Identity.Saml2
             }
 
             RedirectLocation = new Uri(string.Join(saml2RequestResponse.Destination.OriginalString.Contains('?') ? "&" : "?", saml2RequestResponse.Destination.OriginalString, requestQueryString));
-
-            return this;
         }
 
         private string SigneQueryString(string queryString, X509Certificate2 signingCertificate)
@@ -108,14 +106,14 @@ namespace ITfoxtec.Identity.Saml2
             if ((!(saml2RequestResponse is Saml2AuthnRequest) || saml2RequestResponse.Config.SignAuthnRequest) &&
                 saml2RequestResponse.SignatureValidationCertificates != null && saml2RequestResponse.SignatureValidationCertificates.Count() > 0)
             {
-                var actualAignatureAlgorithm = request.Query[Saml2Constants.Message.SigAlg];
+                var actualSignatureAlgorithm = request.Query[Saml2Constants.Message.SigAlg];
                 if (saml2RequestResponse.SignatureAlgorithm == null)
                 {
-                    saml2RequestResponse.SignatureAlgorithm = actualAignatureAlgorithm;
+                    saml2RequestResponse.SignatureAlgorithm = actualSignatureAlgorithm;
                 }
-                else if (!saml2RequestResponse.SignatureAlgorithm.Equals(actualAignatureAlgorithm, StringComparison.InvariantCulture))
+                else if (!saml2RequestResponse.SignatureAlgorithm.Equals(actualSignatureAlgorithm, StringComparison.InvariantCulture))
                 {
-                    throw new Exception($"Signature Algorithm do not match. Expected algorithm {saml2RequestResponse.SignatureAlgorithm} actual algorithm {actualAignatureAlgorithm}");
+                    throw new Exception($"Signature Algorithm do not match. Expected algorithm {saml2RequestResponse.SignatureAlgorithm} actual algorithm {actualSignatureAlgorithm}");
                 }
                 if (saml2RequestResponse.XmlCanonicalizationMethod == null)
                 {
@@ -160,11 +158,12 @@ namespace ITfoxtec.Identity.Saml2
         {
             foreach (var signatureValidationCertificate in signatureValidationCertificates)
             {
-                saml2RequestResponse.IdentityConfiguration.CertificateValidator.Validate(signatureValidationCertificate);
-
                 var saml2Sign = new Saml2SignedText(signatureValidationCertificate, SignatureAlgorithm);
                 if (saml2Sign.CheckSignature(Encoding.UTF8.GetBytes(new RawSaml2QueryString(queryString, messageName).SignedQueryString), signatureValue))
                 {
+                    // Check if certificate used to sign is valid
+                    saml2RequestResponse.IdentityConfiguration.CertificateValidator.Validate(signatureValidationCertificate);
+
                     // Signature is valid.
                     return;
                 }

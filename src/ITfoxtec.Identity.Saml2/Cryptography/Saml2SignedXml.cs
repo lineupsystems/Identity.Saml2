@@ -46,21 +46,42 @@ namespace ITfoxtec.Identity.Saml2.Cryptography
                 throw new InvalidSignatureException("Invalid XML signature reference.");
             }
 
-            var referenceId = (SignedInfo.References[0] as Reference).Uri.Substring(1);
+            if (SignedInfo.CanonicalizationMethod != CanonicalizationMethod)
+            {
+                throw new InvalidSignatureException($"Illegal canonicalization method {SignedInfo.CanonicalizationMethod} used in signature.");
+            }
+
+            if (SignedInfo.SignatureMethod != Saml2Signer.SignatureAlgorithm)
+            {
+                throw new InvalidSignatureException($"Illegal signature method {SignedInfo.SignatureMethod} used in signature.");
+            }
+
+            var reference = SignedInfo.References[0] as Reference;
+            AssertReferenceValid(reference);
+
+            return CheckSignature(Saml2Signer.Certificate.GetRSAPublicKey());
+        }
+
+        private void AssertReferenceValid(Reference reference)
+        {
+            var referenceId = reference.Uri.Substring(1);
             if (Element != GetIdElement(Element.OwnerDocument, referenceId))
             {
                 throw new InvalidSignatureException("XML signature reference do not refer to the root element.");
             }
 
-            var canonicalizationMethodValid = SignedInfo.CanonicalizationMethod == CanonicalizationMethod;
-            var signatureMethodValid = SignedInfo.SignatureMethod == Saml2Signer.SignatureAlgorithm;
-            if (!(canonicalizationMethodValid && signatureMethodValid))
+            AssertTransformChainValid(reference.TransformChain);
+        }
+
+        private void AssertTransformChainValid(TransformChain transformChain)
+        {
+            foreach (Transform transform in transformChain)
             {
-                return false;
-            }
-            else
-            {                        
-                return CheckSignature(Saml2Signer.Certificate.GetRSAPublicKey());
+                var algorithm = transform.Algorithm;
+                if (algorithm != XmlDsigEnvelopedSignatureTransformUrl && algorithm != CanonicalizationMethod)
+                {
+                    throw new InvalidSignatureException($"Illegal transform method {algorithm} used in signature.");
+                }
             }
         }
     }

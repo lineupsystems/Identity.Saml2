@@ -1,5 +1,4 @@
-﻿using ITfoxtec.Identity.Saml2.Schemas;
-using System;
+﻿using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml;
 using System.Xml.Linq;
@@ -8,7 +7,7 @@ namespace ITfoxtec.Identity.Saml2
 {
     public class Saml2ArtifactResponse : Saml2Response
     {
-        public override string ElementName => Saml2Constants.Message.ArtifactResponse;
+        public override string ElementName => Schemas.Saml2Constants.Message.ArtifactResponse;
 
         /// <summary>
         /// [Optional]
@@ -30,14 +29,14 @@ namespace ITfoxtec.Identity.Saml2
 
         public override XmlDocument ToXml()
         {
-            var envelope = new XElement(Saml2Constants.ProtocolNamespaceX + ElementName);
+            var envelope = new XElement(Schemas.Saml2Constants.ProtocolNamespaceX + ElementName);
             envelope.Add(base.GetXContent());
             XmlDocument = envelope.ToXmlDocument();
 
             var innerRequestXml = InnerRequest.ToXml();
-            var status = XmlDocument.DocumentElement[Saml2Constants.Message.Status, Saml2Constants.ProtocolNamespace.OriginalString];
+            var status = XmlDocument.DocumentElement[Schemas.Saml2Constants.Message.Status, Schemas.Saml2Constants.ProtocolNamespace.OriginalString];
             XmlDocument.DocumentElement.InsertAfter(XmlDocument.ImportNode(innerRequestXml.DocumentElement, true), status);
-            
+
             if (Config.SigningCertificate != null)
             {
                 SignArtifactResponse();
@@ -64,31 +63,10 @@ namespace ITfoxtec.Identity.Saml2
         {
             base.Read(xml, validate, detectReplayedTokens);
 
-            if (Status == Saml2StatusCodes.Success)
+            if (Status == Schemas.Saml2StatusCodes.Success)
             {
-                InnerRequest.Read(GetInnerArtifactResponseXml(InnerRequest.ElementName), false, false);
+                InnerRequest.Read(GetInnerArtifactElementXml().OuterXml, false, false);
             }
-        }
-
-        string innerArtifactResponseXmlCache = null;
-        private string GetInnerArtifactResponseXml(string innerElementName, bool returnNull = false)
-        {
-            if (innerArtifactResponseXmlCache == null)
-            {
-                var innerElements = XmlDocument.DocumentElement.SelectNodes(string.Format("//*[local-name()='{0}']", innerElementName));
-                if (innerElements?.Count == 1)
-                {
-                    innerArtifactResponseXmlCache = innerElements[0].OuterXml;
-                }
-                else
-                {
-                    if (!returnNull && innerElements?.Count != 1)
-                    {
-                        throw new Saml2RequestException("There is not exactly one inner artifact response element.");
-                    }
-                }
-            }
-            return innerArtifactResponseXmlCache;
         }
 
         XmlElement assertionElementCache = null;
@@ -96,33 +74,42 @@ namespace ITfoxtec.Identity.Saml2
         {
             if (assertionElementCache == null)
             {
+                if (Status == Schemas.Saml2StatusCodes.Success && InnerRequest is Saml2AuthnResponse)
+                {
 #if NETFULL || NETSTANDARD || NETCORE || NET50 || NET60
-                assertionElementCache = GetAssertionElementReference().ToXmlDocument().DocumentElement;
+                    assertionElementCache = GetAssertionElementReference().ToXmlDocument().DocumentElement;
 #else
-                assertionElementCache = GetAssertionElementReference();
+                    assertionElementCache = GetAssertionElementReference();
 #endif
+                }
             }
             return assertionElementCache;
         }
 
         private XmlElement GetAssertionElementReference()
         {
-            if(InnerRequest is Saml2AuthnResponse)
+            var assertionElements = GetInnerArtifactElementXml().SelectNodes($"//*[local-name()='{Schemas.Saml2Constants.Message.Assertion}']");
+            if (assertionElements.Count != 1)
             {
-                var innerArtifactResponseXml = GetInnerArtifactResponseXml(InnerRequest.ElementName, returnNull: true);
-                if (innerArtifactResponseXml != null)
-                {
-                    InnerRequest.Read(innerArtifactResponseXml, false, false);
-
-                    var assertionElements = InnerRequest.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='{Schemas.Saml2Constants.Message.Assertion}']");
-                    if (assertionElements.Count != 1)
-                    {
-                        throw new Saml2RequestException("There is not exactly one Assertion element. Maybe the response is encrypted (set the Saml2Configuration.DecryptionCertificate).");
-                    }
-                    return assertionElements[0] as XmlElement;
-                }
+                throw new Saml2RequestException("There is not exactly one Assertion element in the inner Artifact element.");
             }
-            return null;
+            return assertionElements[0] as XmlElement;
+        }
+
+        XmlNode innerArtifactElementCache = null;
+        private XmlNode GetInnerArtifactElementXml()
+        {
+            if (innerArtifactElementCache == null)
+            {
+                var innerElements = XmlDocument.DocumentElement.SelectNodes(string.Format("//*[local-name()='{0}']", InnerRequest.ElementName));
+                if (innerElements?.Count != 1)
+                {
+                    throw new Saml2RequestException("There is not exactly one inner artifact element.");
+                }
+                innerArtifactElementCache = innerElements[0];
+            }
+
+            return innerArtifactElementCache;
         }
     }
 }
