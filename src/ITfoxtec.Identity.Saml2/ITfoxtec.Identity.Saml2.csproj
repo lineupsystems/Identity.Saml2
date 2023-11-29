@@ -6,7 +6,7 @@
     <Company>ITfoxtec</Company>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <AssemblyName>ITfoxtec.Identity.Saml2</AssemblyName>
-    <PackageId>ITfoxtec.Identity.Saml2</PackageId>
+    <PackageId>Lineup.Identity.Saml2</PackageId>
     <Title>ITfoxtec Identity SAML 2.0</Title>
     <Description>The ITfoxtec Identity Saml2 package adds SAML-P support for both Identity Provider (IdP) and Relying Party (RP) on top of the SAML 2.0 functionality implemented in .NET.
 
