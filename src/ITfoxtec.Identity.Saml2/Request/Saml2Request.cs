@@ -1,4 +1,4 @@
-﻿using ITfoxtec.Identity.Saml2.Configuration;
+using ITfoxtec.Identity.Saml2.Configuration;
 using ITfoxtec.Identity.Saml2.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,9 @@ using System.IdentityModel.Tokens;
 #else
 using Microsoft.IdentityModel.Tokens.Saml2;
 #endif
+#if DEBUG
+using System.Diagnostics;
+#endif
 
 namespace ITfoxtec.Identity.Saml2
 {
@@ -22,7 +25,7 @@ namespace ITfoxtec.Identity.Saml2
     /// Generic Saml2 Request.
     /// </summary>
     public abstract class Saml2Request
-    {        
+    {
         public abstract string ElementName { get; }
 
         public Saml2Configuration Config { get; protected set; }
@@ -159,7 +162,7 @@ namespace ITfoxtec.Identity.Saml2
             if (Extensions != null)
             {
                 yield return Extensions.ToXElement();
-            }            
+            }
         }
 
         public abstract XmlDocument ToXml();
@@ -170,10 +173,7 @@ namespace ITfoxtec.Identity.Saml2
 
             XmlDocument = xml.ToXmlDocument();
 
-            if (XmlDocument.DocumentElement.NamespaceURI != Schemas.Saml2Constants.ProtocolNamespace.OriginalString)
-            {
-                throw new Saml2RequestException("Not SAML2 Protocol.");
-            }
+            ValidateProtocol();
 
             ValidateElementName();
 
@@ -188,7 +188,7 @@ namespace ITfoxtec.Identity.Saml2
             IssueInstant = XmlDocument.DocumentElement.Attributes[Schemas.Saml2Constants.Message.IssueInstant].GetValueOrNull<DateTimeOffset>();
 
             Issuer = XmlDocument.DocumentElement[Schemas.Saml2Constants.Message.Issuer, Schemas.Saml2Constants.AssertionNamespace.OriginalString].GetValueOrNull<string>();
-            if(!string.IsNullOrEmpty(Config.AllowedIssuer) && !Config.AllowedIssuer.Equals(Issuer, StringComparison.Ordinal))
+            if (!string.IsNullOrEmpty(Config.AllowedIssuer) && !Config.AllowedIssuer.Equals(Issuer, StringComparison.Ordinal))
             {
                 throw new Saml2RequestException($"Invalid Issuer. Actually '{Issuer}', allowed '{Config.AllowedIssuer}'");
             }
@@ -208,6 +208,14 @@ namespace ITfoxtec.Identity.Saml2
             if (MustValidateXmlSignature(validate))
             {
                 ValidateXmlSignature(documentValidationResult);
+            }
+        }
+
+        protected virtual void ValidateProtocol()
+        {
+            if (XmlDocument.DocumentElement.NamespaceURI != Schemas.Saml2Constants.ProtocolNamespace.OriginalString)
+            {
+                throw new Saml2RequestException("Not SAML2 Protocol.");
             }
         }
 
@@ -267,12 +275,13 @@ namespace ITfoxtec.Identity.Saml2
 
             foreach (var signatureValidationCertificate in SignatureValidationCertificates)
             {
-                IdentityConfiguration.CertificateValidator.Validate(signatureValidationCertificate);
-
                 var signedXml = new Saml2SignedXml(xmlElement, signatureValidationCertificate, SignatureAlgorithm, XmlCanonicalizationMethod);
                 signedXml.LoadXml(xmlSignatures[0] as XmlElement);
                 if (signedXml.CheckSignature())
                 {
+                    // Check if certificate used to sign is valid
+                    IdentityConfiguration.CertificateValidator.Validate(signatureValidationCertificate);
+
                     // Signature is valid.
                     return SignatureValidation.Valid;
                 }

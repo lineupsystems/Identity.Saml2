@@ -1,4 +1,4 @@
-﻿using ITfoxtec.Identity.Saml2.Schemas;
+using ITfoxtec.Identity.Saml2.Schemas;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Security;
 using System.IdentityModel.Selectors;
 using System.Security.Cryptography.Xml;
+using System.Linq;
 #if NETFULL
 using System.IdentityModel.Configuration;
 #else
@@ -87,7 +88,13 @@ namespace ITfoxtec.Identity.Saml2
         ///	In SAML (Security Assertion Markup Language), encryption is used to protect sensitive information within SAML assertions and messages. When an entity (e.g., an Identity Provider - IdP) wants to send a SAML assertion that contains sensitive data, it can encrypt the assertion using the public key of the recipient (e.g., a Service Provider - SP). The recipient (SP) can then decrypt the encrypted assertion using its corresponding private key, which is associated with its X509 certificate.
         /// </remarks>
         /// </summary>
-        public X509Certificate2 DecryptionCertificate { get; set; }
+        [Obsolete("DecryptionCertificate is obsolete to support multiple decryption certificates. Use DecryptionCertificates instead.")]
+        public X509Certificate2 DecryptionCertificate
+        {
+            get { return DecryptionCertificates?.FirstOrDefault(); }
+            set { DecryptionCertificates = new List<X509Certificate2> { value }; }
+        }
+        public List<X509Certificate2> DecryptionCertificates { get; set; } = new List<X509Certificate2>();
         
         /// <summary>
         /// Certificate used for encrypting SAML messages, such as SAML assertions.

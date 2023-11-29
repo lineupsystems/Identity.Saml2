@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens.Saml2;
 using TestIdPCore.Models;
 using ITfoxtec.Identity.Saml2.Schemas.Metadata;
@@ -15,6 +14,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Concurrent;
+using Saml2Http = ITfoxtec.Identity.Saml2.Http;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -42,27 +42,27 @@ namespace TestIdPCore.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login()
         {
-            var requestBinding = new Saml2RedirectBinding();
-            var relyingParty = await ValidateRelyingParty(ReadRelyingPartyFromLoginRequest(requestBinding));
+            var httpRequest = Request.ToGenericHttpRequest(validate: true);
+            var relyingParty = await ValidateRelyingParty(ReadRelyingPartyFromLoginRequest(httpRequest));
 
             var saml2AuthnRequest = new Saml2AuthnRequest(GetRpSaml2Configuration(relyingParty));
             try
             {
-                requestBinding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnRequest);
+                httpRequest.Binding.Unbind(httpRequest, saml2AuthnRequest);
 
                 // ****  Handle user login e.g. in GUI ****
                 // Test user with session index and claims
                 var sessionIndex = Guid.NewGuid().ToString();
                 var claims = CreateTestUserClaims(saml2AuthnRequest.Subject?.NameID?.ID);
 
-                return LoginResponse(saml2AuthnRequest.Id, Saml2StatusCodes.Success, requestBinding.RelayState, relyingParty, sessionIndex, claims);
+                return LoginResponse(saml2AuthnRequest.Id, Saml2StatusCodes.Success, httpRequest.Binding.RelayState, relyingParty, sessionIndex, claims);
             }
             catch (Exception exc)
             {
 #if DEBUG
                 Debug.WriteLine($"Saml 2.0 Authn Request error: {exc.ToString()}\nSaml Auth Request: '{saml2AuthnRequest.XmlDocument?.OuterXml}'\nQuery String: {Request.QueryString}");
 #endif
-                return LoginResponse(saml2AuthnRequest.Id, Saml2StatusCodes.Responder, requestBinding.RelayState, relyingParty);
+                return LoginResponse(saml2AuthnRequest.Id, Saml2StatusCodes.Responder, httpRequest.Binding.RelayState, relyingParty);
             }
         }
         
@@ -103,38 +103,38 @@ namespace TestIdPCore.Controllers
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {
-            var requestBinding = new Saml2PostBinding();
-            var relyingParty = await ValidateRelyingParty(ReadRelyingPartyFromLogoutRequest(requestBinding));
+            var httpRequest = Request.ToGenericHttpRequest(validate: true);
+            var relyingParty = await ValidateRelyingParty(ReadRelyingPartyFromLogoutRequest(httpRequest));
 
             var saml2LogoutRequest = new Saml2LogoutRequest(GetRpSaml2Configuration(relyingParty));
             try
             {
-                requestBinding.Unbind(Request.ToGenericHttpRequest(), saml2LogoutRequest);
+                httpRequest.Binding.Unbind(httpRequest, saml2LogoutRequest);
 
                 // **** Delete user session ****
 
-                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Success, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
+                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Success, httpRequest.Binding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
             }
             catch (Exception exc)
             {
 #if DEBUG
                 Debug.WriteLine($"Saml 2.0 Logout Request error: {exc.ToString()}\nSaml Logout Request: '{saml2LogoutRequest.XmlDocument?.OuterXml}'");
 #endif
-                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Responder, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
+                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Responder, httpRequest.Binding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
             }
         }
 
-        private string ReadRelyingPartyFromLoginRequest<T>(Saml2Binding<T> binding)
+        private string ReadRelyingPartyFromLoginRequest(Saml2Http.HttpRequest httpRequest)
         {
-            return binding.ReadSamlRequest(Request.ToGenericHttpRequest(), new Saml2AuthnRequest(GetRpSaml2Configuration()))?.Issuer;
+            return httpRequest.Binding.ReadSamlRequest(httpRequest, new Saml2AuthnRequest(GetRpSaml2Configuration()))?.Issuer;
         }
 
-        private string ReadRelyingPartyFromLogoutRequest<T>(Saml2Binding<T> binding)
+        private string ReadRelyingPartyFromLogoutRequest(Saml2Http.HttpRequest httpRequest)
         {
-            return binding.ReadSamlRequest(Request.ToGenericHttpRequest(), new Saml2LogoutRequest(GetRpSaml2Configuration()))?.Issuer;
+            return httpRequest.Binding.ReadSamlRequest(httpRequest, new Saml2LogoutRequest(GetRpSaml2Configuration()))?.Issuer;
         }
 
-        private string ReadRelyingPartyFromSoapEnvelopeRequest<T>(ITfoxtec.Identity.Saml2.Http.HttpRequest httpRequest, Saml2Binding<T> binding)
+        private string ReadRelyingPartyFromSoapEnvelopeRequest(ITfoxtec.Identity.Saml2.Http.HttpRequest httpRequest, Saml2Binding binding)
         {
             return binding.ReadSamlRequest(httpRequest, new Saml2ArtifactResolve(GetRpSaml2Configuration()))?.Issuer;
         }
@@ -171,9 +171,9 @@ namespace TestIdPCore.Controllers
                 //saml2AuthnResponse.NameId = new Saml2NameIdentifier(claimsIdentity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single());
                 saml2AuthnResponse.ClaimsIdentity = claimsIdentity;
 
-                var token = saml2AuthnResponse.CreateSecurityToken(relyingParty.Issuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+                var token = saml2AuthnResponse.CreateSecurityToken(relyingParty.Issuer, /*declAuthnContext: new Uri("urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"),*/ subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
             }
-
+            
             return responsebinding.Bind(saml2AuthnResponse).ToActionResult();
         }
 
@@ -244,8 +244,11 @@ namespace TestIdPCore.Controllers
 
             if (relyingParty != null) 
             {
-                rpConfig.SignatureValidationCertificates.Add(relyingParty.SignatureValidationCertificate);
-                rpConfig.EncryptionCertificate = relyingParty.EncryptionCertificate;
+                rpConfig.SignatureValidationCertificates.AddRange(relyingParty.SignatureValidationCertificates);
+                if (relyingParty.EecryptionCertificates?.Count() > 0)
+                {
+                    rpConfig.EncryptionCertificate = relyingParty.EecryptionCertificates.LastOrDefault();
+                }
             }
 
             return rpConfig;
@@ -253,8 +256,8 @@ namespace TestIdPCore.Controllers
 
         private async Task<RelyingParty> ValidateRelyingParty(string issuer)
         {
-            using var cancellationTokenSource = new CancellationTokenSource(3 * 1000); // Cancel after 3 seconds.
-            await Task.WhenAll(settings.RelyingParties.Select(rp => LoadRelyingPartyAsync(rp, cancellationTokenSource)));
+            // Create a cancellation token for each Relying Party call
+            await Task.WhenAll(settings.RelyingParties.Select(rp => LoadRelyingPartyAsync(rp, new CancellationTokenSource(1 * 1000))));
 
             return settings.RelyingParties.Where(rp => rp.Issuer != null && rp.Issuer.Equals(issuer, StringComparison.InvariantCultureIgnoreCase)).Single();
         }
@@ -274,7 +277,8 @@ namespace TestIdPCore.Controllers
                         rp.AcsDestination = entityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault).OrderBy(a => a.Index).First().Location;
                         var singleLogoutService = entityDescriptor.SPSsoDescriptor.SingleLogoutServices.First();
                         rp.SingleLogoutDestination = singleLogoutService.ResponseLocation ?? singleLogoutService.Location;
-                        rp.SignatureValidationCertificate = entityDescriptor.SPSsoDescriptor.SigningCertificates.First();
+                        rp.SignatureValidationCertificates = entityDescriptor.SPSsoDescriptor.SigningCertificates;
+                        rp.EecryptionCertificates = entityDescriptor.SPSsoDescriptor.EncryptionCertificates;
                     }
                     else
                     {
