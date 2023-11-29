@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Authors>Anders Revsgaard, Tomas Bouda</Authors>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Company>ITfoxtec</Company>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <AssemblyName>ITfoxtec.Identity.Saml2.MvcCore</AssemblyName>
