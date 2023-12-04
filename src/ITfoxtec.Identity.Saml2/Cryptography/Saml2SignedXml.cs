@@ -2,6 +2,7 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography.Xml;
 using System.Xml;
+using Serilog;
 
 namespace ITfoxtec.Identity.Saml2.Cryptography
 {
@@ -53,7 +54,7 @@ namespace ITfoxtec.Identity.Saml2.Cryptography
 
             if (SignedInfo.SignatureMethod != Saml2Signer.SignatureAlgorithm)
             {
-                throw new InvalidSignatureException($"Illegal signature method {SignedInfo.SignatureMethod} used in signature.");
+               Log.Warning("Illegal signature method {SignatureMethod} used in signature! {ExpectedSignature} was expected", SignedInfo.SignatureMethod, Saml2Signer.SignatureAlgorithm);
             }
 
             var reference = SignedInfo.References[0] as Reference;
