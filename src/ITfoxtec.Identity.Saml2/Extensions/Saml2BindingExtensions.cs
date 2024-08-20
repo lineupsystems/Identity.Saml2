@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace ITfoxtec.Identity.Saml2
 {
@@ -71,7 +72,8 @@ namespace ITfoxtec.Identity.Saml2
             var match = Regex.Match(rawRelayState, @"(?<key>[^=^&]+)=(?<value>[^=^&]*)(&(?<key>[^=^&]+)=(?<value>[^=^&]*))*");
             if (!match.Success || match.Groups["key"] == null || match.Groups["value"] == null)
             {
-                throw new InvalidDataException("Invalid Relay State Query.");
+                Log.Warning("RelayState query string is not valid! RelayState: {RelayState}", rawRelayState);
+                return elements;
             }
 
             for (var i = 0; i < match.Groups["key"].Captures.Count; i++)
