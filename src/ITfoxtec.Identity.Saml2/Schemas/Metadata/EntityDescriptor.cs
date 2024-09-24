@@ -78,6 +78,12 @@ namespace ITfoxtec.Identity.Saml2.Schemas.Metadata
         /// to identity providers supporting SSO.
         /// </summary>
         public IdPSsoDescriptor IdPSsoDescriptor { get; set; }
+        
+        /// <summary>
+        /// [Optional]
+        /// Optional element specifying the organization associated with the entity described by the metadata.
+        /// </summary>
+        public Organization Organization { get; set; }
 
         /// <summary>
         /// [Optional]
@@ -144,6 +150,11 @@ namespace ITfoxtec.Identity.Saml2.Schemas.Metadata
             if (IdPSsoDescriptor != null)
             {
                 yield return IdPSsoDescriptor.ToXElement();
+            }
+            
+            if (Organization != null)
+            {
+                yield return Organization.ToXElement();
             }
 
             if (ContactPersons != null)
