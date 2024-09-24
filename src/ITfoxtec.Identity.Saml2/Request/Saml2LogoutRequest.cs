@@ -73,6 +73,18 @@ namespace ITfoxtec.Identity.Saml2
             NameId = new Saml2NameIdentifier(nameId, new Uri(nameIdFormat));
             SessionIndex = sessionIndex;
         }
+        
+        /// <summary>
+        /// Constructs <see cref="Saml2LogoutRequest"/> with the given parameters obtained from IdPSession
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="nameId"></param>
+        /// <param name="sessionIndex"></param>
+        public Saml2LogoutRequest(Saml2Configuration config, string nameId, string sessionIndex) : this(config)
+        {
+            NameId = new Saml2NameIdentifier(nameId);
+            SessionIndex = sessionIndex;
+        }
 
         private static string ReadClaimValue(ClaimsIdentity identity, string claimType, bool required = true)
         {
