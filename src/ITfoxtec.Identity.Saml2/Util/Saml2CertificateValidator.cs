@@ -11,7 +11,7 @@ namespace ITfoxtec.Identity.Saml2.Util
     public class Saml2CertificateValidator : X509CertificateValidator
     {
         public StoreLocation TrustedStoreLocation { get; set; } = StoreLocation.LocalMachine;
-        public X509CertificateValidationMode CertificateValidationMode { get; set; } = X509CertificateValidationMode.ChainTrust;
+        public X509CertificateValidationMode CertificateValidationMode { get; set; } = X509CertificateValidationMode.None;
         public X509RevocationMode RevocationMode { get; set; } = X509RevocationMode.Online;
 
         public override void Validate(X509Certificate2 certificate)
