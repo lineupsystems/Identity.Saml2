@@ -118,8 +118,8 @@ namespace ITfoxtec.Identity.Saml2
         /// Determines the certificate validation mode used when validating X.509 certificates in the context of SAML implementations
         /// <remarks>Certificate validation is the process of verifying the authenticity and trustworthiness of X.509 certificates used by the entities involved in the SAML communication.</remarks>
         /// </summary>
-        [DefaultValue(X509CertificateValidationMode.ChainTrust)]
-        public X509CertificateValidationMode CertificateValidationMode { get; set; } = X509CertificateValidationMode.ChainTrust;
+        [DefaultValue(X509CertificateValidationMode.None)]
+        public X509CertificateValidationMode CertificateValidationMode { get; set; } = X509CertificateValidationMode.None;
         
         /// <summary>
         /// Specifies the mode used for checking the revocation status of X.509 certificates during certificate validation in the context of SAML.
