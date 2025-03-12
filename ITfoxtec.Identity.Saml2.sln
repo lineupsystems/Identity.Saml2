@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebAppCoreArtifact", "t
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebAppCoreAngularApi", "test\TestWebAppCoreAngularApi\TestWebAppCoreAngularApi.csproj", "{788D6556-3740-4D24-B898-7A1845A01A9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SamlHelper", "SamlHelper\SamlHelper.csproj", "{CA70BC4E-DFD8-4637-9124-C53AE915D789}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,10 @@ Global
 		{788D6556-3740-4D24-B898-7A1845A01A9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{788D6556-3740-4D24-B898-7A1845A01A9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{788D6556-3740-4D24-B898-7A1845A01A9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA70BC4E-DFD8-4637-9124-C53AE915D789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA70BC4E-DFD8-4637-9124-C53AE915D789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA70BC4E-DFD8-4637-9124-C53AE915D789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA70BC4E-DFD8-4637-9124-C53AE915D789}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{072134FF-11D2-4EF5-A5C5-0A601DFECE80} = {DE5976C5-83CD-4518-A05E-0DEC2EA5D17C}
 		{2D24E891-3A18-46BE-A0F3-5DB9753551D8} = {DE5976C5-83CD-4518-A05E-0DEC2EA5D17C}
 		{788D6556-3740-4D24-B898-7A1845A01A9E} = {DE5976C5-83CD-4518-A05E-0DEC2EA5D17C}
+		{CA70BC4E-DFD8-4637-9124-C53AE915D789} = {A05F26DE-17C2-497F-B244-EE6790789066}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64BB7D39-E92F-466D-B601-276E16FF6EB4}

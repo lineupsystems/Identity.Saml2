@@ -1,0 +1,24 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:behaviours="clr-namespace:SamlHelper.Behaviours"
+             xmlns:viewModels="clr-namespace:SamlHelper.ViewModels"
+             x:Class="SamlHelper.Views.DecodeTabView"
+             x:DataType="viewModels:DecodeTabViewModel">
+    <StackPanel>
+        <Label>SAML</Label>
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace">
+            <Interaction.Behaviors>
+                <behaviours:DocumentTextBindingBehavior Text="{Binding SamlToDecode, Mode=TwoWay}"/>
+            </Interaction.Behaviors>
+        </avaloniaEdit:TextEditor>
+
+        <Button Command="{Binding DecodeSamlCmd}">Decode</Button>
+
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace">
+            <Interaction.Behaviors>
+                <behaviours:DocumentTextBindingBehavior Text="{Binding DecodedSamlXml, Mode=TwoWay}"/>
+            </Interaction.Behaviors>
+        </avaloniaEdit:TextEditor>
+    </StackPanel>
+</UserControl>

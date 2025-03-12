@@ -1,0 +1,12 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:behaviours="clr-namespace:SamlHelper.Behaviours"
+             xmlns:viewModels="clr-namespace:SamlHelper.ViewModels"
+             x:Class="SamlHelper.Views.EncodeTabView"
+             x:DataType="viewModels:EncodeTabViewModel">
+    <StackPanel>
+        <Label>SAML</Label>
+        
+    </StackPanel>
+</UserControl>
