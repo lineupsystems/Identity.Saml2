@@ -6,6 +6,7 @@
         <entry key="SamlHelper/App.axaml" value="SamlHelper/SamlHelper.csproj" />
         <entry key="SamlHelper/Views/DecodeTabView.axaml" value="SamlHelper/SamlHelper.csproj" />
         <entry key="SamlHelper/Views/EncodeTabView.axaml" value="SamlHelper/SamlHelper.csproj" />
+        <entry key="SamlHelper/Views/MainWindow.axaml" value="SamlHelper/SamlHelper.csproj" />
       </map>
     </option>
   </component>
