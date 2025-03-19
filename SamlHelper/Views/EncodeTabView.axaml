@@ -6,7 +6,27 @@
              x:Class="SamlHelper.Views.EncodeTabView"
              x:DataType="viewModels:EncodeTabViewModel">
     <StackPanel>
-        <Label>SAML</Label>
+        <Label>Saml XML</Label>
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace"  SyntaxHighlighting="XML">
+            <Interaction.Behaviors>
+                <behaviours:DocumentTextBindingBehavior Text="{Binding SamlToEncode, Mode=TwoWay}"/>
+            </Interaction.Behaviors>
+        </avaloniaEdit:TextEditor>
+
+        <Button Command="{Binding EncodeSamlCmd}">Encode</Button>
+
+        <Label>Compressed Saml</Label>
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace" IsReadOnly="True">
+            <Interaction.Behaviors>
+                <behaviours:DocumentTextBindingBehavior Text="{Binding CompressedSamlXml, Mode=TwoWay}"/>
+            </Interaction.Behaviors>
+        </avaloniaEdit:TextEditor>
         
+        <Label>Url Encoded Saml</Label>
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace" IsReadOnly="True">
+            <Interaction.Behaviors>
+                <behaviours:DocumentTextBindingBehavior Text="{Binding UrlEncodedSamlXml, Mode=TwoWay}"/>
+            </Interaction.Behaviors>
+        </avaloniaEdit:TextEditor>
     </StackPanel>
 </UserControl>

@@ -6,7 +6,7 @@
              x:Class="SamlHelper.Views.DecodeTabView"
              x:DataType="viewModels:DecodeTabViewModel">
     <StackPanel>
-        <Label>SAML</Label>
+        <Label>Compressed SAML</Label>
         <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace">
             <Interaction.Behaviors>
                 <behaviours:DocumentTextBindingBehavior Text="{Binding SamlToDecode, Mode=TwoWay}"/>
@@ -15,10 +15,27 @@
 
         <Button Command="{Binding DecodeSamlCmd}">Decode</Button>
 
-        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace">
+        <Label>Saml XML</Label>
+        <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace" SyntaxHighlighting="XML" IsReadOnly="True">
             <Interaction.Behaviors>
                 <behaviours:DocumentTextBindingBehavior Text="{Binding DecodedSamlXml, Mode=TwoWay}"/>
             </Interaction.Behaviors>
         </avaloniaEdit:TextEditor>
+        
+        <StackPanel IsVisible="{Binding IsQueryString}">
+            <Label>Signature</Label>
+            <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace" IsReadOnly="True">
+                <Interaction.Behaviors>
+                    <behaviours:DocumentTextBindingBehavior Text="{Binding Signature, Mode=TwoWay}"/>
+                </Interaction.Behaviors>
+            </avaloniaEdit:TextEditor>
+            
+            <Label>Signature Algorithm</Label>
+            <avaloniaEdit:TextEditor ShowLineNumbers="True" BorderThickness="1" BorderBrush="LightGray" MinHeight="20" WordWrap="True" FontFamily="Cascadia Code,Consolas,Menlo,Monospace" IsReadOnly="True">
+                <Interaction.Behaviors>
+                    <behaviours:DocumentTextBindingBehavior Text="{Binding SignatureAlgorithm, Mode=TwoWay}"/>
+                </Interaction.Behaviors>
+            </avaloniaEdit:TextEditor>
+        </StackPanel>
     </StackPanel>
 </UserControl>
