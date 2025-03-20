@@ -50,7 +50,7 @@ public partial class DecodeTabViewModel : TabViewModel
             {
                 IsQueryString = true;
                     
-                var sAMLResponse = queryParams["SAMLResponse"];
+                var sAMLResponse = queryParams["SAMLResponse"] ?? queryParams["SAMLRequest"];
                 Signature = queryParams["Signature"];
                 SignatureAlgorithm = queryParams["SigAlg"];
                     
